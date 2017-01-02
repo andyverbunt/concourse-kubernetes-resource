@@ -18,6 +18,8 @@ fi
 # for jq
 PATH=/usr/local/bin:$PATH
 
+payload=$(mktemp $TMPDIR/kubernetes-resource-request.XXXXXX)
+
 cat > $payload <&0
 
 server=$(jq -r '.source.server // ""' < "$payload")
