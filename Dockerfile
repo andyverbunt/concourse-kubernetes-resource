@@ -4,10 +4,8 @@ RUN apk --update add \
   ca-certificates \
   bash \
   jq \
-  nodejs \
-  git
-
-RUN npm install -g semver
+  git \
+  curl
 
 # can't `git pull` unless we set these
 RUN git config --global user.email "git@localhost" && \
