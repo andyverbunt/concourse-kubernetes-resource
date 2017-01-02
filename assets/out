@@ -25,18 +25,20 @@ cat > $payload <&0
 server=$(jq -r '.source.server // ""' < "$payload")
 token=$(jq -r '.source.token // ""' < "$payload")
 namespace=$(jq -r '.source.namespace // ""' < "$payload")
-cert=$(jq -r '.source.cert // ""' < "$payload")
-
 manifests=$(jq -r '.params.manifests // ""' < "$payload")
-
+jq -r '.source.cert // ""' < "$payload" > "$source/$manifests/ca.crt"
 
 log "source: $source"
 log "server: $server"
 log "token: $token"
 log "namespace $namespace"
-log "cert $cert"
-
 log "manifests $manifests"
+
+
+kubectl config set-cluster adhoc-cluster --server=$server --certificate-authority=$source/$manifests/ca.crt --embed-certs=true
+kubectl config set-credentials adhoc-cluster-admin --token=$token
+kubectl config set-context adhoc-cluster-context --user=adhoc-cluster-admin --cluster=adhoc-cluster --namespace=$namespace
+kubectl apply -f $source/$manifests --context=adhoc-cluster-context
 
 timestamp="$(jq -n "{version:{timestamp:\"$(date +%s)\"}}")"
 echo "$timestamp" | jq -s add  >&3
